@@ -1,0 +1,58 @@
+{\rtf1\ansi\ansicpg1252\cocoartf1038\cocoasubrtf360
+{\fonttbl\f0\fswiss\fcharset0 Helvetica;}
+{\colortbl;\red255\green255\blue255;}
+{\*\listtable{\list\listtemplateid1\listhybrid{\listlevel\levelnfc23\levelnfcn23\leveljc0\leveljcn0\levelfollow0\levelstartat1\levelspace360\levelindent0{\*\levelmarker \{hyphen\}}{\leveltext\leveltemplateid1\'01\uc0\u8259 ;}{\levelnumbers;}\fi-360\li720\lin720 }{\listlevel\levelnfc23\levelnfcn23\leveljc0\leveljcn0\levelfollow0\levelstartat1\levelspace360\levelindent0{\*\levelmarker \{hyphen\}}{\leveltext\leveltemplateid2\'01\uc0\u8259 ;}{\levelnumbers;}\fi-360\li1440\lin1440 }{\listname ;}\listid1}}
+{\*\listoverridetable{\listoverride\listid1\listoverridecount0\ls1}}
+\paperw11900\paperh16840\margl1440\margr1440\vieww11680\viewh11520\viewkind0
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\sl360\slmult1\ql\qnatural\pardirnatural
+
+\f0\b\fs30 \cf0 mf-gapi-connector\
+\
+\pard\tx560\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\sl360\slmult1\ql\qnatural\pardirnatural
+
+\b0\fs24 \cf0 Lo scopo del plugin \'e8 permettere un facile collegamento di MainFrame alle api di google e salvare i vari token per poi permetterci di utilizzare tali api per varie funzioni.
+\b\fs30 \
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\sl360\slmult1\ql\qnatural\pardirnatural
+\cf0 \
+\pard\tx560\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\sl360\slmult1\ql\qnatural\pardirnatural
+
+\b0\fs24 \cf0 Creare lo scheletro del plugin. Serve solo una cartella con il nome su scritto e un file php mf-gapi-connector.php. il file php comincia con una parte commentata tipo questa (preso da una mini plugin che ho fatto per mainframe)\
+\
+/*\
+Plugin Name: WP Admin Only\
+Plugin URI: //\
+Description: Log out non admin users.\
+Version: 1.0\
+Author: Angelo D'Ambrosio\
+Author URI: http://onebakaapart.wordpress.com/\
+*/\
+\
+Nella cartella poi metti la cartella delle librerie google-api-php-client https://code.google.com/p/google-api-php-client che ci servono per interagire con google. Effettivamente, essendo che l'unico scopo della plugin \'e8 autenticare il sito non ci servirebbero tutte le altre librerie per i singoli servizi. Una buona idea potrebbe essere salvare il path della cartella google-api-php-client/src nelle opzioni, per essere poi recuperata ovunque nel sito!\
+\
+Prima di creare l'applicazione devi registrarti presso la google api console: {\field{\*\fldinst{HYPERLINK "https://code.google.com/apis/console/"}}{\fldrslt https://code.google.com/apis/console/}}. Io direi che per ora puoi creare un tuo account per smanettare. Quando ti chieder\'e0 l'url puoi anche mettere localhost, quindi puoi lavorare in locale. Alla fine del procedimento avrai un CLIENT_ID ed un CLIENT_SECRET che ti serviranno per autorizzarti con google.\
+\pard\tx560\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\sl360\slmult1\ql\qnatural\pardirnatural
+\cf0 \
+Allora il procedimento \'e8 questo ed andrebbe in mf-gapi-connector.php:\
+\pard\tx220\tx720\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\li720\fi-720\sl360\slmult1\ql\qnatural\pardirnatural
+\ls1\ilvl0\cf0 {\listtext	\uc0\u8259 	}Creare una pagina di settings che esca nel menu settings di WP. Chiamerei la pagina Google API Connect. per info su come creare tale pagina consulta le settings api di WP: {\field{\*\fldinst{HYPERLINK "http://codex.wordpress.org/Settings_API"}}{\fldrslt http://codex.wordpress.org/Settings_API}} con in fondo molti tutorials. Non ricordo se le api per creare il sotto menu di Settings per accedere alla nostra pagina sono trattate in quella stessa pagina del codex.\
+{\listtext	\uc0\u8259 	} I dati immessi nella pagina (definiti sotto) verranno salvari nel database di WP attraverso le API e ovviamente devono essere richiamati per riempire la pagina una volta che l'utente ci ritorna.\
+{\listtext	\uc0\u8259 	}In questa pagina dovrebbero:\
+\pard\tx940\tx1440\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\li1440\fi-1440\sl360\slmult1\ql\qnatural\pardirnatural
+\ls1\ilvl1\cf0 {\listtext	\uc0\u8259 	}Due textbox per inserire il client ID e secret.\
+{\listtext	\uc0\u8259 	}Uno spazio per inserire gli scope che ci servono. Basta un textfield con l'indicazione di mettere uno scope per ogni riga. In pratica gli scopes dicono a google che permessi ha la applicazione nei confronti dell'utente a cui si vuole accedere. Hai presente quando connetti l'account fb o google ed esce un box che ti dice: "la pagina vuole accedere a questa, quella e quell'altra informazione e vuole postare roba per conto tuo"? ecco quelle domande vengono create in base agli scope richiesti. La nostra plugin deve prendere e salvare questi scopes. Pi\'f9 info sugli scopes di gdrive per esempio qui: https://developers.google.com/drive/scopes\
+{\listtext	\uc0\u8259 	}Un pulsante "Autorizza" per far partire il processo di autorizzazione.\
+\pard\tx220\tx720\tx1120\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\li720\fi-720\sl360\slmult1\ql\qnatural\pardirnatural
+\ls1\ilvl0\cf0 {\listtext	\uc0\u8259 	}Una volta premuto quel pulsante parte il processo di autenticazione.\
+{\listtext	\uc0\u8259 	}L'autorizzazione si basa su di un processo chiamato OAuth2.0, che in pratica ti fa andare su una pagina di google in cui tu darai autorizzazione ad accedere a certe funzioni del tuo account (definite dagli scopes) ed in cambio google ti restituisce un "token" per accedere a tali servizi in remoto. Qui trovi una descrizione teorica del processo con tanto di grafico UML {\field{\*\fldinst{HYPERLINK "https://developers.google.com/accounts/docs/OAuth2#webserver"}}{\fldrslt https://developers.google.com/accounts/docs/OAuth2#webserver}}. Inoltre, visto che a noi serve che MF accedi a google anche quando il titolare dell'account non \'e8 connesso, e i token dopo un po' scadono, ci serve anche un "refresh token" che ci permette appunto di richiedere un nuovo token senza la necessaria autorizzazione dell'utente.\
+{\listtext	\uc0\u8259 	}Entrambi questi token andranno salvati in WP utilizzando le settings api o le option api {\field{\*\fldinst{HYPERLINK "http://codex.wordpress.org/Options_API"}}{\fldrslt http://codex.wordpress.org/Options_API}} (mi sembra che le settings stesse si basano sulle options).\
+{\listtext	\uc0\u8259 	}Il codice per l'autorizzazione \'e8 la parte pi\'f9 scocciante. Ho fatto uno script dimostrati\'ecvo che per\'f2 fallisce nell'autenticazione... Metto un po' di link sull'argomento:\
+\pard\tx940\tx1440\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\li1440\fi-1440\sl360\slmult1\ql\qnatural\pardirnatural
+\ls1\ilvl1\cf0 {\listtext	\uc0\u8259 	}{\field{\*\fldinst{HYPERLINK "https://developers.google.com/accounts/docs/OAuth2WebServer"}}{\fldrslt https://developers.google.com/accounts/docs/OAuth2WebServer}}\
+{\listtext	\uc0\u8259 	}{\field{\*\fldinst{HYPERLINK "https://developers.google.com/accounts/docs/OAuth2#webserver"}}{\fldrslt https://developers.google.com/accounts/docs/OAuth2#webserver}}\
+{\listtext	\uc0\u8259 	}{\field{\*\fldinst{HYPERLINK "https://code.google.com/p/google-api-php-client/source/browse/trunk/examples/urlshortener/index.php"}}{\fldrslt https://code.google.com/p/google-api-php-client/source/browse/trunk/examples/urlshortener/index.php}} mi sono basato fortemente su questo.\
+{\listtext	\uc0\u8259 	} e altre mila versioni in giro, tutte con implementazioni leggermente diverse. Ci sono anche un paio di plugin per WP con la loro implementazione http://wordpress.org/extend/plugins/wp-google-drive/ e {\field{\*\fldinst{HYPERLINK "http://wordpress.org/extend/plugins/backup/"}}{\fldrslt http://wordpress.org/extend/plugins/backup/}} che possono esserti utili. \
+\pard\tx220\tx720\tx1120\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\li720\fi-720\sl360\slmult1\ql\qnatural\pardirnatural
+\ls1\ilvl0\cf0 {\listtext	\uc0\u8259 	}In tutti gli esempi vengono richiesti i vari client id, secret che avrai gi\'e0 salvato. Viene chiesto anche il redirect url che sar\'e0 lo stesso della pagina di settings. Viene prodotto il token che appunto devi salvare nel database (gli esempi per fare prima lo salvano nella globale $_SESSION, ma \'e8 meglio il database.\
+{\listtext	\uc0\u8259 	}Una volta salvato il token il lavoro \'e8 fatto! Questo token sar\'e0 utilizzato dalle altre applicazioni per accedere ai servizi google. Nota che tale token deve essere rigenerato ogni volta che viene cambiato qualcosa, tipo gli scopes!\
+{\listtext	\uc0\u8259 	}That's all folks!\
+}
